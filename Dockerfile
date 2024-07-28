@@ -5,9 +5,9 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copia los archivos de requirements.txt al directorio de trabajo
-COPY requirements.txt requirements.txt
+COPY requirements.txt .
 
-# Actualiza pip y luego instala las dependencias, esto nos dará más detalles en los logs
+# Actualiza pip y luego instala las dependencias
 RUN python -m pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copia el contenido del directorio actual al directorio de trabajo en la imagen
@@ -18,4 +18,5 @@ EXPOSE 8000
 
 # Define el comando para ejecutar la aplicación
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
+
 
