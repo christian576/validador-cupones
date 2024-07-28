@@ -1,9 +1,10 @@
 from flask import Flask, request, render_template, redirect, url_for, flash, session
 import psycopg2
 import os
+from generar_cupones import generar_cupones  # Asegúrate de que este import esté correcto
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')
+app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')  # Configura tu clave secreta en las variables de entorno
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -24,12 +25,12 @@ def validate():
     voucher = cur.fetchone()
     cur.close()
     conn.close()
-    
+
     if voucher:
         flash('Voucher válido. ¡Disfruta tu cena!')
     else:
         flash('Voucher no válido. Por favor, intenta nuevamente.')
-    
+
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -37,7 +38,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == os.environ['USERNAME'] and password == os.environ['PASSWORD']:
+        if username == os.environ.get('USERNAME', 'admin') and password == os.environ.get('PASSWORD', 'password'):
             session['logged_in'] = True
             return redirect(url_for('generar'))
         else:
@@ -50,7 +51,7 @@ def generar():
         return redirect(url_for('login'))
     if request.method == 'POST':
         cantidad = int(request.form['cantidad'])
-        generar_cupones(cantidad)
+        generar_cupones(cantidad)  # Asegúrate de que esta función esté definida correctamente en generar_cupones.py
         flash('Cupones generados con éxito!')
         return redirect(url_for('generar'))
     return render_template('generar.html')
@@ -59,10 +60,6 @@ def generar():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
-
-def generar_cupones(cantidad):
-    # Lógica para generar los cupones
-    pass
 
 if __name__ == '__main__':
     app.run(debug=True)
