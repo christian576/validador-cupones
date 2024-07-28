@@ -1,17 +1,12 @@
 from flask import Flask, request, render_template, redirect, url_for, flash, session
-import psycopg2
 import os
 from generar_cupones import generar_cupones
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')  # Usa una clave por defecto si no está configurada
-
-DATABASE_URL = os.environ.get('DATABASE_URL')
-USERNAME = os.environ.get('USERNAME')
-PASSWORD = os.environ.get('PASSWORD')
+app.secret_key = os.environ['SECRET_KEY']
 
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(os.environ['DATABASE_URL'])
     return conn
 
 @app.route('/')
@@ -27,12 +22,10 @@ def validate():
     voucher = cur.fetchone()
     cur.close()
     conn.close()
-
     if voucher:
         flash('Voucher válido. ¡Disfruta tu cena!')
     else:
         flash('Voucher no válido. Por favor, intenta nuevamente.')
-
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -40,11 +33,12 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == USERNAME and password == PASSWORD:
+        if username == os.environ['USERNAME'] and password == os.environ['PASSWORD']:
             session['logged_in'] = True
             return redirect(url_for('generar'))
         else:
             flash('Credenciales incorrectas')
+            return render_template('login.html')
     return render_template('login.html')
 
 @app.route('/generar', methods=['GET', 'POST'])
@@ -52,8 +46,7 @@ def generar():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     if request.method == 'POST':
-        cantidad = int(request.form['cantidad'])
-        generar_cupones(cantidad)
+        generar_cupones()
         flash('Cupones generados con éxito!')
         return redirect(url_for('generar'))
     return render_template('generar.html')
@@ -65,3 +58,4 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
