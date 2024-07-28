@@ -17,5 +17,5 @@ COPY . .
 EXPOSE 8000
 
 # Comando para ejecutar la aplicación
-CMD ["python", "app.py"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8000", "app:app"]
 
