@@ -1,20 +1,23 @@
-from flask import Flask
 import os
+from flask import Flask, jsonify
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
 app = Flask(__name__)
-
-# Configuración de la aplicación a partir de variables de entorno
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 
-# Opcional: otras configuraciones si las necesitas
-app.config['USERNAME'] = os.environ.get('USERNAME')
-app.config['PASSWORD'] = os.environ.get('PASSWORD')
+# Conexión a la base de datos
+DATABASE_URL = os.environ.get('DATABASE_URL')
+conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 
 @app.route('/')
-def home():
-    return "Hello, Flask is up and running!"
+def index():
+    return 'Hello, world!'
+
+@app.route('/test')
+def test():
+    return jsonify({"message": "API is working"}), 200
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
 
