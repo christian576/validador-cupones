@@ -4,11 +4,7 @@ import os
 from generar_cupones import generar_cupones
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY', 'defaultsecret')  # Usar variable de entorno o un valor por defecto
-
-# Datos de autenticación
-USERNAME = os.environ.get('USERNAME', 'admin')
-PASSWORD = os.environ.get('PASSWORD', 'Calamar718!')
+app.secret_key = os.environ['SECRET_KEY']
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -29,12 +25,12 @@ def validate():
     voucher = cur.fetchone()
     cur.close()
     conn.close()
-    
+
     if voucher:
         flash('Voucher válido. ¡Disfruta tu cena!')
     else:
         flash('Voucher no válido. Por favor, intenta nuevamente.')
-    
+
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -42,7 +38,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == USERNAME and password == PASSWORD:
+        if username == os.environ['USERNAME'] and password == os.environ['PASSWORD']:
             session['logged_in'] = True
             return redirect(url_for('generar'))
         else:
@@ -56,7 +52,7 @@ def generar():
     if request.method == 'POST':
         cantidad = int(request.form['cantidad'])
         generar_cupones(cantidad)
-        flash('¡Cupones generados con éxito!')
+        flash('Cupones generados con éxito!')
         return redirect(url_for('generar'))
     return render_template('generar.html')
 
