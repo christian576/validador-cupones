@@ -1,21 +1,18 @@
-# Usa una imagen base de Python
+# Usar una imagen base oficial de Python
 FROM python:3.9-slim
 
-# Establece el directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos necesarios
+# Copiar los archivos de requerimientos y el código
 COPY requirements.txt requirements.txt
-
-# Instala las dependencias
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copia el resto de los archivos de la aplicación
 COPY . .
 
-# Expone el puerto en el que correrá la aplicación
+# Instalar las dependencias
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Exponer el puerto
 EXPOSE 8000
 
-# Comando para ejecutar la aplicación
+# Comando para correr la aplicación usando waitress
 CMD ["waitress-serve", "--port=8000", "app:app"]
-
