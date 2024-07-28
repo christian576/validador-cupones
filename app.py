@@ -1,9 +1,10 @@
-from flask import Flask, request, render_template, redirect, url_for, flash
+from flask import Flask, request, render_template, redirect, url_for, flash, session
 import psycopg2
 import os
+from generar_cupones import generar_cupones
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Necesario para usar flash messages
+app.secret_key = 'd2b7f3c9e2f84cfc9181a4c27493ffb5'  # Reemplaza esto con tu clave secreta generada
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -32,5 +33,33 @@ def validate():
     
     return redirect(url_for('index'))
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == 'admin' and password == 'Calamar718!':  # Cambia esto a la contraseña que quieras usar
+            session['logged_in'] = True
+            return redirect(url_for('generar'))
+        else:
+            flash('Credenciales incorrectas')
+    return render_template('login.html')
+
+@app.route('/generar', methods=['GET', 'POST'])
+def generar():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        generar_cupones()
+        flash('Cupones generados con éxito!')
+        return redirect(url_for('generar'))
+    return render_template('generar.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
     app.run(debug=True)
+
