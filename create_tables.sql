@@ -1,0 +1,5 @@
+CREATE TABLE vouchers (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(255) UNIQUE NOT NULL,
+    redeemed BOOLEAN DEFAULT FALSE
+);

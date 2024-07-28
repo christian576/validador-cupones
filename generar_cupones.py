@@ -85,7 +85,7 @@ for _ in range(10):
     # Guardar la imagen del cupón
     coupon.save(f"qrcodes/{code}.png")
     
-    cursor.execute('INSERT INTO vouchers (code, used) VALUES (%s, %s) ON CONFLICT (code) DO NOTHING', (code, 0))
+    cursor.execute('INSERT INTO vouchers (code, redeemed) VALUES (%s, %s) ON CONFLICT (code) DO NOTHING', (code, False))
     conn.commit()
 
 cursor.close()

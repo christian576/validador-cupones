@@ -14,3 +14,6 @@ typing_extensions==4.12.2
 uuid==1.30
 Werkzeug==3.0.3
 psycopg2
+Flask==3.0.3
+psycopg2==2.9.6
+

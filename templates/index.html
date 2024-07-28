@@ -1,34 +1,69 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <title>Validar Voucher</title>
-  </head>
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12 text-center">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Selquet Restaurant + Bar">
-          <h1>Validar Voucher</h1>
-          <form method="POST" action="{{ url_for('validate') }}">
-            <div class="form-group">
-              <input type="text" class="form-control" name="voucher_code" placeholder="Código de Voucher" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Validar</button>
-          </form>
-          {% with messages = get_flashed_messages() %}
-            {% if messages %}
-              <div class="alert alert-info mt-3">
-                {% for message in messages %}
-                  <p>{{ message }}</p>
-                {% endfor %}
-              </div>
-            {% endif %}
-          {% endwith %}
-        </div>
-      </div>
-    </div>
-  </body>
-</html>
+from flask import Flask, request, render_template, redirect, url_for, flash, session
+import psycopg2
+import os
+from generar_cupones import generar_cupones
+
+app = Flask(__name__)
+app.secret_key = 'd2b7f3c9e2f84cfc9181a4c27493f2f8'  # Reemplaza esto con tu clave secreta generada
+
+DATABASE_URL = os.environ['DATABASE_URL']
+
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
+
+# Datos de autenticación
+USERNAME = 'admin'
+PASSWORD = 'Calamar718!'  # Cambia esto a la contraseña que quieras usar
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/validate', methods=['POST'])
+def validate():
+    voucher_code = request.form['voucher_code']
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM vouchers WHERE code = %s", (voucher_code,))
+    voucher = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    if voucher:
+        flash('Voucher válido. ¡Disfruta tu cena!')
+    else:
+        flash('Voucher no válido. Por favor, intenta nuevamente.')
+    
+    return redirect(url_for('index'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        if username == USERNAME and password == PASSWORD:
+            session['logged_in'] = True
+            return redirect(url_for('generar'))
+        else:
+            flash('Credenciales incorrectas')
+    return render_template('login.html')
+
+@app.route('/generar', methods=['GET', 'POST'])
+def generar():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    
+    if request.method == 'POST':
+        generar_cupones()
+        flash('Cupones generados con éxito!')
+        return redirect(url_for('generar'))
+    return render_template('generar.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    app.run(debug=True)

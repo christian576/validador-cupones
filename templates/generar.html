@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <title>Generar Cupones</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <img src="{{ url_for('static', filename='logo.png') }}" alt="Selquet Restaurant + Bar">
+          <h1>Generar Cupones</h1>
+          <form method="POST" action="{{ url_for('generar') }}">
+            <button type="submit" class="btn btn-primary">Generar Cupones</button>
+          </form>
+          <a href="{{ url_for('logout') }}" class="btn btn-secondary mt-3">Cerrar Sesión</a>
+          {% with messages = get_flashed_messages() %}
+            {% if messages %}
+              <div class="alert alert-info mt-3">
+                {% for message in messages %}
+                  <p>{{ message }}</p>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
