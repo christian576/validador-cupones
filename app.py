@@ -4,9 +4,11 @@ import os
 from generar_cupones import generar_cupones
 
 app = Flask(__name__)
-app.secret_key = os.environ['SECRET_KEY']
+app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')  # Usa una clave por defecto si no está configurada
 
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = os.environ.get('DATABASE_URL')
+USERNAME = os.environ.get('USERNAME')
+PASSWORD = os.environ.get('PASSWORD')
 
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
@@ -38,7 +40,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == os.environ['USERNAME'] and password == os.environ['PASSWORD']:
+        if username == USERNAME and password == PASSWORD:
             session['logged_in'] = True
             return redirect(url_for('generar'))
         else:
