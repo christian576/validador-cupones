@@ -1,17 +1,21 @@
-# Usa una imagen base oficial de Python
+# Usa una imagen base de Python
 FROM python:3.9-slim
 
 # Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos de requisitos y luego instala las dependencias
+# Copia los archivos necesarios
 COPY requirements.txt requirements.txt
+
+# Instala las dependencias
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copia el contenido de la aplicación
+# Copia el resto de los archivos de la aplicación
 COPY . .
 
-# Comando por defecto para ejecutar la aplicación
-CMD ["python", "app.py"]
+# Expone el puerto en el que correrá la aplicación
+EXPOSE 8000
 
+# Comando para ejecutar la aplicación
+CMD ["python", "app.py"]
 
