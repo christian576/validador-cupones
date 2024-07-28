@@ -10,12 +10,14 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12 text-center">
-          <img src="{{ url_for('static', filename='logo.png') }}" alt="Selquet Restaurant + Bar">
           <h1>Generar Cupones</h1>
           <form method="POST" action="{{ url_for('generar') }}">
-            <button type="submit" class="btn btn-primary">Generar Cupones</button>
+            <div class="form-group">
+              <label for="cantidad">Cantidad de Cupones</label>
+              <input type="number" class="form-control" name="cantidad" id="cantidad" placeholder="Cantidad de Cupones" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Generar</button>
           </form>
-          <a href="{{ url_for('logout') }}" class="btn btn-secondary mt-3">Cerrar Sesión</a>
           {% with messages = get_flashed_messages() %}
             {% if messages %}
               <div class="alert alert-info mt-3">
@@ -30,3 +32,4 @@
     </div>
   </body>
 </html>
+

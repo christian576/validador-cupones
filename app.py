@@ -4,13 +4,17 @@ import os
 from generar_cupones import generar_cupones
 
 app = Flask(__name__)
-app.secret_key = 'd2b7f3c9e2f84cfc9181a4c27493ffb5'  # Reemplaza esto con tu clave secreta generada
+app.secret_key = 'd2b7f3c9e2f84cfc9181a4c27493ffcb'  # Reemplaza esto con tu clave secreta generada
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
     return conn
+
+# Datos de autenticación
+USERNAME = 'admin'
+PASSWORD = 'Calamar718!'  # Cambia esto a la contraseña que quieras usar
 
 @app.route('/')
 def index():
@@ -25,12 +29,11 @@ def validate():
     voucher = cur.fetchone()
     cur.close()
     conn.close()
-    
+
     if voucher:
         flash('Voucher válido. ¡Disfruta tu cena!')
     else:
         flash('Voucher no válido. Por favor, intenta nuevamente.')
-    
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -38,7 +41,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == 'admin' and password == 'Calamar718!':  # Cambia esto a la contraseña que quieras usar
+        if username == USERNAME and password == PASSWORD:
             session['logged_in'] = True
             return redirect(url_for('generar'))
         else:
@@ -50,8 +53,9 @@ def generar():
     if not session.get('logged_in'):
         return redirect(url_for('login'))
     if request.method == 'POST':
-        generar_cupones()
-        flash('Cupones generados con éxito!')
+        cantidad = int(request.form['cantidad'])
+        generar_cupones(cantidad)
+        flash(f'{cantidad} cupones generados con éxito!')
         return redirect(url_for('generar'))
     return render_template('generar.html')
 
