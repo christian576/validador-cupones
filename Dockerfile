@@ -7,8 +7,8 @@ WORKDIR /app
 # Copia los archivos de requirements.txt al directorio de trabajo
 COPY requirements.txt requirements.txt
 
-# Instala las dependencias
-RUN pip install --no-cache-dir -r requirements.txt
+# Actualiza pip y luego instala las dependencias, esto nos dará más detalles en los logs
+RUN python -m pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # Copia el contenido del directorio actual al directorio de trabajo en la imagen
 COPY . .
@@ -18,3 +18,4 @@ EXPOSE 8000
 
 # Define el comando para ejecutar la aplicación
 CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000"]
+
