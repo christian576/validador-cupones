@@ -1,4 +1,5 @@
 import qrcode
+import qrcode
 import psycopg2
 import os
 from urllib.parse import urlparse
@@ -78,5 +79,3 @@ def generar_cupones(cantidad):
     cursor.close()
     conn.close()
     print(f"{cantidad} códigos QR generados, guardados en la base de datos y como imágenes en la carpeta 'static/qrcodes'.")
-
-
