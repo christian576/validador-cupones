@@ -1,20 +1,15 @@
 from flask import Flask, request, render_template, redirect, url_for, flash, session
 import psycopg2
 import os
-from generar_cupones import generar_cupones
 
 app = Flask(__name__)
-app.secret_key = 'd2b7f3c9e2f84cfc9181a4c27493ffcb'  # Reemplaza esto con tu clave secreta generada
+app.secret_key = os.environ.get('SECRET_KEY', 'supersecretkey')
 
 DATABASE_URL = os.environ['DATABASE_URL']
 
 def get_db_connection():
     conn = psycopg2.connect(DATABASE_URL)
     return conn
-
-# Datos de autenticación
-USERNAME = 'admin'
-PASSWORD = 'Calamar718!'  # Cambia esto a la contraseña que quieras usar
 
 @app.route('/')
 def index():
@@ -29,11 +24,12 @@ def validate():
     voucher = cur.fetchone()
     cur.close()
     conn.close()
-
+    
     if voucher:
         flash('Voucher válido. ¡Disfruta tu cena!')
     else:
         flash('Voucher no válido. Por favor, intenta nuevamente.')
+    
     return redirect(url_for('index'))
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -41,7 +37,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        if username == USERNAME and password == PASSWORD:
+        if username == os.environ['USERNAME'] and password == os.environ['PASSWORD']:
             session['logged_in'] = True
             return redirect(url_for('generar'))
         else:
@@ -55,7 +51,7 @@ def generar():
     if request.method == 'POST':
         cantidad = int(request.form['cantidad'])
         generar_cupones(cantidad)
-        flash(f'{cantidad} cupones generados con éxito!')
+        flash('Cupones generados con éxito!')
         return redirect(url_for('generar'))
     return render_template('generar.html')
 
@@ -63,6 +59,10 @@ def generar():
 def logout():
     session.pop('logged_in', None)
     return redirect(url_for('login'))
+
+def generar_cupones(cantidad):
+    # Lógica para generar los cupones
+    pass
 
 if __name__ == '__main__':
     app.run(debug=True)
