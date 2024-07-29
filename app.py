@@ -1,6 +1,9 @@
 from flask import Flask
 
 app = Flask(__name__)
+import os
+port = int(os.environ.get("PORT", 8000))
+# Usa 'port' en lugar de 8000 al iniciar tu servidor
 
 @app.route('/')
 def index():
