@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["waitress-serve", "--port=8000", "app:app"]
+CMD ["waitress-serve", "--port=8080", "app:app"]
